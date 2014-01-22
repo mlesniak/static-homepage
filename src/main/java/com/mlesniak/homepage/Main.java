@@ -14,10 +14,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.nio.file.*;
+import java.util.*;
 
 public class Main {
     String[] args;
@@ -39,6 +37,32 @@ public class Main {
             case "build":
             default:
                 build();
+        }
+
+        if (args.length > 1 && args[1].equals("-w")) {
+            startWatch();
+        }
+    }
+
+    /** Quick and dirty watch service w/o error handling. */
+    private void startWatch() {
+        try {
+            WatchService watcher = FileSystems.getDefault().newWatchService();
+            Path source = Paths.get(Config.get("source"));
+            WatchKey key = source.register(watcher,
+                    StandardWatchEventKinds.ENTRY_CREATE,
+                    StandardWatchEventKinds.ENTRY_DELETE,
+                    StandardWatchEventKinds.ENTRY_MODIFY);
+
+            while (true) {
+                WatchKey watchKey;
+                watchKey = watcher.take();
+                watchKey.pollEvents();
+                build();
+                watchKey.reset();
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -66,6 +90,7 @@ public class Main {
     }
 
     private void build() {
+        System.out.println("Starting build. " + new Date());
         File sourceDirectory = Config.getFile("source");
         File targetDirectory = Config.getFile("target");
         copyStaticFiles(sourceDirectory, targetDirectory);
@@ -109,7 +134,7 @@ public class Main {
         String layout = null;
         try {
             layout = FileUtils.readFileToString(
-                    new File(sourceDirectory.getPath() + "/_layout/"+ config.getProperty("layout") + ".html"));
+                    new File(sourceDirectory.getPath() + "/_layout/" + config.getProperty("layout") + ".html"));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
