@@ -57,8 +57,20 @@ public class Main {
             while (true) {
                 WatchKey watchKey;
                 watchKey = watcher.take();
-                watchKey.pollEvents();
-                build();
+                for (WatchEvent<?> event: key.pollEvents()) {
+                    WatchEvent.Kind<?> kind = event.kind();
+                    if (kind == StandardWatchEventKinds.OVERFLOW) {
+                        continue;
+                    }
+                    WatchEvent<Path> ev = (WatchEvent<Path>)event;
+                    Path filename = ev.context();
+                    if (filename.toString().equals("_site")) {
+                        break;
+                    }
+                    System.out.println("Changed: " + filename);
+                    build();
+                }
+
                 watchKey.reset();
             }
         } catch (IOException | InterruptedException e) {
@@ -93,6 +105,14 @@ public class Main {
         System.out.println("Starting build. " + new Date());
         File sourceDirectory = Config.getFile("source");
         File targetDirectory = Config.getFile("target");
+
+        try {
+            FileUtils.deleteDirectory(targetDirectory);
+            FileUtils.forceMkdir(targetDirectory);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         copyStaticFiles(sourceDirectory, targetDirectory);
         createDynamicFiles(sourceDirectory, targetDirectory);
     }
