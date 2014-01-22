@@ -1,3 +1,5 @@
+package com.mlesniak.homepage;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
