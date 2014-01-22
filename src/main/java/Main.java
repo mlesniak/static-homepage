@@ -10,18 +10,29 @@ import java.io.File;
 import java.io.IOException;
 
 public class Main {
+    String[] args;
+
     public static void main(String[] args) {
+        Main main = new Main(args);
+        main.handleCommandLine();
+    }
+
+    public Main(String[] args) {
+        this.args = args;
+    }
+
+    private void handleCommandLine() {
         switch (args[0]) {
             case "serve":
-                serve(args);
+                serve();
                 break;
             case "build":
             default:
-                build(args);
+                build();
         }
     }
 
-    private static void serve(String[] args) {
+    private void serve() {
         String contentRoot = Config.get("target");
         Server server = new Server(8080);
 
@@ -44,14 +55,14 @@ public class Main {
         }
     }
 
-    private static void build(String[] args) {
+    private void build() {
         File sourceDirectory = Config.getFile("source");
         File targetDirectory = Config.getFile("target");
         copyStaticFiles(sourceDirectory, targetDirectory);
         createDynamicFiles(sourceDirectory, targetDirectory);
     }
 
-    private static void copyStaticFiles(File sourceDirectory, File targetDirectory) {
+    private void copyStaticFiles(File sourceDirectory, File targetDirectory) {
         IOFileFilter filter = new IOFileFilter() {
             @Override
             public boolean accept(File file) {
@@ -72,7 +83,7 @@ public class Main {
         }
     }
 
-    private static void createDynamicFiles(File sourceDirectory, File targetDirectory) {
+    private void createDynamicFiles(File sourceDirectory, File targetDirectory) {
 
     }
 }
