@@ -121,12 +121,16 @@ public class Main {
         IOFileFilter filter = new IOFileFilter() {
             @Override
             public boolean accept(File file) {
-                return !(file.getName().startsWith("_") || file.getName().startsWith("."));
+                return accept(file.getName());
             }
 
             @Override
             public boolean accept(File dir, String name) {
-                return !(dir.getName().startsWith("_") || dir.getName().startsWith("."));
+                return accept(dir.getName());
+            }
+
+            private boolean accept(String name) {
+                return !(name.startsWith("_") || name.startsWith("."));
             }
         };
 
