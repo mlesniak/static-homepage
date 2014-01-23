@@ -141,6 +141,10 @@ public class Main {
     private void createDynamicFiles(File sourceDirectory, File targetDirectory) {
         File pages = new File(sourceDirectory.toPath() + "/_pages");
         for (File file : FileUtils.listFiles(pages, null, false)) {
+            if (file.getName().startsWith("_")) {
+                continue;
+            }
+            System.out.println("  Processing " + file);
             handleDynamicFile(sourceDirectory, targetDirectory, file);
         }
     }
