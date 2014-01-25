@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.*;
 import java.util.*;
+import java.util.regex.Matcher;
 
 public class Main {
     String[] args;
@@ -170,7 +171,7 @@ public class Main {
 
         // Replace variables.
         for (String key : config.stringPropertyNames()) {
-            layout = layout.replaceAll("\\$\\{" + key + "\\}", config.getProperty(key));
+            layout = layout.replaceAll("\\$\\{" + key + "\\}", Matcher.quoteReplacement(config.getProperty(key)));
         }
 
         // Replace content.
